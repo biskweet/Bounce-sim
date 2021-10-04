@@ -5,6 +5,6 @@
 #### Requirements : 
 
 *   Python 3.7 and its built-in modules
-*   `pygame` and `matplotlib` for movement visualization as graphs
+*   `pygame` for graphics and `matplotlib` for movement visualization
 *   Speakers I guess?
 
