@@ -1,5 +1,4 @@
 import pygame as pg
-#from pygame import gfxdraw as gfxd
 from pygame.locals import QUIT
 import random as r
 import matplotlib.pyplot as plt
@@ -11,14 +10,14 @@ WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 WINDOW_DEPTH = 100
 TOTAL_INIT = 0
-FPS = 144
+FRAMERATE = 144
 NUM_OBJ = 10
 FONT = pg.font.SysFont("JetBrains Mono", 20)
 SOUNDS = (pg.mixer.Sound("pop1.mp3"),
           pg.mixer.Sound("pop2.mp3"))
 
 
-class Obj:
+class Ball:
     def __init__(self, x, y, radius, dx, dy, color):
         self.x = x
         self.y = y
@@ -58,19 +57,19 @@ def create_objects(NUM_OBJ, default_radius=25, radius_shift=5, speed_width=[-4, 
 
         color = [r.randint(0, 255) for _ in range(3)]
 
-        objects.append(Obj(x, y, radius, dx, dy, color))
+        objects.append(Ball(x, y, radius, dx, dy, color))
     return objects
 
 
 beginning = time.time()                                        # Starting time
-clock = pg.time.Clock()                                        # Clock for handling FPS
+clock = pg.time.Clock()                                        # Clock for handling framerate
 running = True                                                 # Game boolean
 last_sound = time.time()
 
 screen = pg.display.set_mode([WINDOW_WIDTH, WINDOW_HEIGHT])    # Creating window
-screen.fill((240, 240, 240))                                   # Filling window w/ backroung color
+screen.fill((240, 240, 240))                                   # Filling window with backroung color
 
-objects = create_objects(NUM_OBJ, speed_width=[-8, 8], radius_shift=15)         # Creating list of objects
+objects = create_objects(NUM_OBJ, speed_width=[-6, 6], radius_shift=5)         # Creating list of objects
 movement = []
 fps_hist = []
 
@@ -99,9 +98,9 @@ while running:
                 obj.dx /= (total / TOTAL_INIT)
                 obj.dy /= (total / TOTAL_INIT)
 
-        # Collisions
+        # ------ Collisions ------
         collided = []
-        for obj1 in objects:                                   # Checking collisions below
+        for obj1 in objects:
             for obj2 in objects:
                 if obj1 is obj2: continue
 
@@ -112,15 +111,16 @@ while running:
 
                     vBA_norm = norm(vBA)
 
-
+                    # Basically normalizing the vector between the centers
+                    # of the balls so its norm is interpenetration long
                     intersection = (vBA[0]/(vBA_norm/(obj1.radius + obj2.radius - dist)),
                                     vBA[1]/(vBA_norm/(obj1.radius + obj2.radius - dist)))
 
-                    
-                    obj1.dx += intersection[0] / (obj1.radius/obj2.radius)  # noqa: E226
-                    obj1.dy += intersection[1] / (obj1.radius/obj2.radius)  # noqa: E226
 
-                    if time.time() - last_sound > 0.05:
+                    obj1.dx += intersection[0] / (obj1.radius/obj2.radius)
+                    obj1.dy += intersection[1] / (obj1.radius/obj2.radius)
+
+                    if time.time() - last_sound > 0.05:  # Do not spam sounds
                         r.choice(SOUNDS).play()
                         last_sound = time.time()
 
@@ -134,12 +134,12 @@ while running:
         for obj in objects:
             pg.draw.circle(screen, obj.color, (obj.x, obj.y), obj.radius)
 
-        fps_surface, actual_fps = update_fps()
+        fps_surface, fps = update_fps()
         screen.blit(fps_surface, (10, 0))
         pg.display.flip()
-        clock.tick(FPS)
+        clock.tick(FRAMERATE)
 
-        fps_hist.append(actual_fps)
+        fps_hist.append(fps)
         movement.append(total)
 
 
