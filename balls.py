@@ -111,8 +111,8 @@ while running:
 
                     vBA_norm = norm(vBA)
 
-                    # Basically normalizing the vector between the centers
-                    # of the balls so its norm is interpenetration long
+                    # Normalizing the vector that goes between the centers
+                    # of the balls, so its norm is the interpenetration long
                     intersection = (vBA[0]/(vBA_norm/(obj1.radius + obj2.radius - dist)),
                                     vBA[1]/(vBA_norm/(obj1.radius + obj2.radius - dist)))
 
