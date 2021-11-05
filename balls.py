@@ -11,7 +11,7 @@ WINDOW_HEIGHT = 720
 WINDOW_DEPTH = 100
 TOTAL_INIT = 0
 FRAMERATE = 144
-NUM_OBJ = 10
+NUM_OBJ = 2
 FONT = pg.font.SysFont("JetBrains Mono", 20)
 SOUNDS = (pg.mixer.Sound("pop1.mp3"),
           pg.mixer.Sound("pop2.mp3"))
@@ -69,7 +69,7 @@ last_sound = time.time()
 screen = pg.display.set_mode([WINDOW_WIDTH, WINDOW_HEIGHT])    # Creating window
 screen.fill((240, 240, 240))                                   # Filling window with backroung color
 
-objects = create_objects(NUM_OBJ, speed_width=[-6, 6], radius_shift=5)         # Creating list of objects
+objects = create_objects(NUM_OBJ, speed_width=[-6, 6], radius_shift=15)         # Creating list of objects
 movement = []
 fps_hist = []
 
@@ -107,18 +107,18 @@ while running:
                 dist = distance(obj1, obj2)
                 if (dist < (obj1.radius + obj2.radius)):
                    
-                    vBA = (obj1.x - obj2.x, obj1.y - obj2.y)   # A is center of obj1 and B is center of obj2
+                    vD = (obj1.x - obj2.x, obj1.y - obj2.y)   # A is center of obj1 and B is center of obj2
 
-                    vBA_norm = norm(vBA)
+                    vD_norm = norm(vD)
 
                     # Normalizing the vector that goes between the centers
                     # of the balls, so its norm is the interpenetration long
-                    intersection = (vBA[0]/(vBA_norm/(obj1.radius + obj2.radius - dist)),
-                                    vBA[1]/(vBA_norm/(obj1.radius + obj2.radius - dist)))
+                    v = (vD[0] * (obj1.radius + obj2.radius - dist)/(vD_norm),
+                         vD[1] * (obj1.radius + obj2.radius - dist)/(vD_norm))
 
 
-                    obj1.dx += intersection[0] / (obj1.radius/obj2.radius)
-                    obj1.dy += intersection[1] / (obj1.radius/obj2.radius)
+                    obj1.dx += (v[0] * obj2.radius) / obj1.radius
+                    obj1.dy += (v[1] * obj2.radius) / obj1.radius
 
                     if time.time() - last_sound > 0.05:  # Do not spam sounds
                         r.choice(SOUNDS).play()
