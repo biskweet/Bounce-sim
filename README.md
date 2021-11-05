@@ -14,7 +14,7 @@
 
 This project aims to simulate simple physics using circles that bounce with each other.
 
-It creates N instances of a `Ball` class that store:
+It creates N instances of a `Ball` class that stores:
 
 -   The `x` and `y` coordinates of the object's center position;
 -   The `dx` and `dy` displacement vector;
