@@ -117,7 +117,7 @@ while running:
                          vD[1] * (obj1.radius + obj2.radius - dist)/(vD_norm))
 
 
-                    obj1.dx += (v[0] * obj2.radius) / obj1.radius
+                    obj1.dx += (v[0] * obj2.radius) / obj1.radius  # Reducing the shift by the mass difference
                     obj1.dy += (v[1] * obj2.radius) / obj1.radius
 
                     if time.time() - last_sound > 0.05:  # Do not spam sounds
