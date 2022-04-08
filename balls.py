@@ -11,7 +11,10 @@ WINDOW_HEIGHT = 720
 WINDOW_DEPTH = 100
 TOTAL_INIT = 0
 FRAMERATE = 144
-NUM_OBJ = 2
+NUM_OBJ = 3
+FRICTION_COEFFICIENT = 0.999
+BOUNCE_LOSS = 0.995
+
 FONT = pg.font.SysFont("JetBrains Mono", 20)
 SOUNDS = (pg.mixer.Sound("pop1.mp3"),
           pg.mixer.Sound("pop2.mp3"))
@@ -44,7 +47,7 @@ def update_fps():
     return fps_text, fps
 
 
-def create_objects(NUM_OBJ, default_radius=25, radius_shift=5, speed_width=[-4, 4]):
+def create_objects(NUM_OBJ, default_radius=40, radius_shift=5, speed_width=[-4, 4]):
     objects = []
     for _ in range(NUM_OBJ):
 
@@ -69,7 +72,7 @@ last_sound = time.time()
 screen = pg.display.set_mode([WINDOW_WIDTH, WINDOW_HEIGHT])    # Creating window
 screen.fill((240, 240, 240))                                   # Filling window with backroung color
 
-objects = create_objects(NUM_OBJ, speed_width=[-6, 6], radius_shift=15)         # Creating list of objects
+objects = create_objects(NUM_OBJ, speed_width=[-10, 10])         # Creating list of objects
 movement = []
 fps_hist = []
 
@@ -90,13 +93,16 @@ while running:
         for obj in objects:                                    # Moving each object
             obj.x += obj.dx
             obj.y += obj.dy
+            obj.dx *= FRICTION_COEFFICIENT
+            obj.dy *= FRICTION_COEFFICIENT
+            obj.dy += 0.15
             total += abs(obj.dx)
             total += abs(obj.dy)
 
-        if total > TOTAL_INIT:                                 # If too much movement, normalizing
-            for obj in objects:
-                obj.dx /= (total / TOTAL_INIT)
-                obj.dy /= (total / TOTAL_INIT)
+        # if total > TOTAL_INIT:                                 # If too much movement, normalizing
+        #     for obj in objects:
+        #         obj.dx /= total / (TOTAL_INIT)
+        #         obj.dy /= total / (TOTAL_INIT* )
 
         # ------ Collisions ------
         collided = []
@@ -113,21 +119,21 @@ while running:
 
                     # Normalizing the vector that goes between the centers
                     # of the balls, so its norm is the interpenetration long
-                    v = (vD[0] * (obj1.radius + obj2.radius - dist)/(vD_norm),
-                         vD[1] * (obj1.radius + obj2.radius - dist)/(vD_norm))
+                    v = (vD[0] * (obj1.radius + obj2.radius - dist) / (vD_norm),
+                         vD[1] * (obj1.radius + obj2.radius - dist) / (vD_norm))
 
-
-                    obj1.dx += (v[0] * obj2.radius) / obj1.radius  # Reducing the shift by the mass difference
-                    obj1.dy += (v[1] * obj2.radius) / obj1.radius
+                    # Reducing the shift with the mass difference
+                    obj1.dx += (v[0] * obj2.radius * BOUNCE_LOSS) / (obj1.radius)
+                    obj1.dy += (v[1] * obj2.radius * BOUNCE_LOSS) / (obj1.radius)
 
                     if time.time() - last_sound > 0.05:  # Do not spam sounds
                         r.choice(SOUNDS).play()
                         last_sound = time.time()
 
             if (obj1.x > WINDOW_WIDTH - obj1.radius) or (obj1.x < obj1.radius):  # Hit a vertical wall
-                obj1.dx = -obj1.dx
+                obj1.dx = -obj1.dx * BOUNCE_LOSS
             if (obj1.y > WINDOW_HEIGHT - obj1.radius) or (obj1.y < obj1.radius):  # Hit a horizontal wall
-                obj1.dy = -obj1.dy
+                obj1.dy = -obj1.dy * BOUNCE_LOSS
 
 
         screen.fill((240, 240, 240))
