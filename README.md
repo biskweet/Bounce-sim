@@ -23,6 +23,7 @@ It creates N instances of a `Ball` class that stores:
 
 
 
+
 Each iteration of the main loop (every `1/FRAMERATE` second) moves each ball according to its displacement vector.
 
 
@@ -57,5 +58,5 @@ We can also simulate a mass difference between *C1* and *C2* (let's say proporti
 
 ![equation](https://latex.codecogs.com/png.latex?%5Cdpi%7B200%7D%20%5Cbg_white%20%5Clarge%20%5C%5C%20x%20%5Cleftarrow%20x%20&plus;%20%5Cfrac%7Bv_x%20%5Ctimes%20r_2%7D%7Br_1%7D%20%5C%5C%20y%20%5Cleftarrow%20y%20&plus;%20%5Cfrac%7Bv_y%20%5Ctimes%20r_2%7D%7Br_1%7D)
 
-If *r1* ≥ *r2* then *v* is proportionally decreased. Otherwise, *v* is  increased. To prevent that, we normalize the total movement of the simulation at each iteration so it doesn't scale-up infinitely.
+If *r1* ≥ *r2* then *v* is proportionally decreased. However if *r2* > *r1*, *v* is increased. To prevent that, we max out the total movement of the simulation on each iteration so it doesn't scale-up infinitely.
 
